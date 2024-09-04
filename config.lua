@@ -18,7 +18,7 @@ Config.Loot = {
 }
 
 
-PoliceAlert = {
+Config.PoliceAlert = {
     Enabled = true, -- Toggle police alert on or off
     NightChance = 17, -- Chance of police alert at night
     DayChance = 35, -- Chance of police alert during the day
@@ -27,7 +27,7 @@ PoliceAlert = {
 }
 
 -- Police Alert for Oilrig Heist
-PoliceAlert = function()
+policeAlert = function()
     SD.PoliceDispatch({ -- (SD.PoliceDispatch is a sd_lib module and it automatically supports ps-dispatch, cd_dispatch, core-dispatch, linden_outlawalert, and qs-dispatch )
         displayCode = "10-21C",                    -- Dispatch Code
         title = 'Parcel Theft',                   -- Title is used in cd_dispatch/ps-dispatch
