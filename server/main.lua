@@ -94,3 +94,5 @@ RegisterNetEvent('sd-parceltheft:server:MarkPropTaken', function(propId)
         TriggerClientEvent('sd-parceltheft:client:ResetProp', -1, propId)
     end)
 end)
+
+SD.CheckVersion('Samuels-Development/sd-parceltheft') -- Check version of specified resource
