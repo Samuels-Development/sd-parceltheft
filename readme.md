@@ -7,8 +7,8 @@ https://streamable.com/6bnx5d
 
 ## 🔔 Contact
 Author: Samuel#0008  
-Discord: [Join the Discord](https://discord.gg/samueldev)
-Store: [Click Me](https://fivem.samueldev.shop)
+Discord: [Join the Discord](https://discord.gg/samueldev)<br>
+Store: [Click Me](https://fivem.samueldev.shop) (use code `qbox` at checkout)
 
 ## 💾 Installation
 1. Download the latest release from the [GitHub repository](https://github.com/Samuels-Development/sd-parceltheft/releases).
@@ -17,9 +17,10 @@ Store: [Click Me](https://fivem.samueldev.shop)
 4. Add `ensure sd-parceltheft` to your `server.cfg` to ensure the resource starts with your server.
 
 ## 📦 Item
-1. Add an item called 'parcel' to your inventory or framework.
+Add an item called 'parcel' to your inventory or framework.
 
-If you're using `qb-core`, add it in `qb-core/shared/items.lua` or to the items table in the database for ESX. 
+If you're using `qb-core`, add it in `qb-core/shared/items.lua`.
+If you're using `es_extended`, add it to the items table in your database! 
 
 In the case of `ox_inventory`, add the following to the items.lua:
 ```lua
@@ -40,10 +41,6 @@ In the case of `ox_inventory`, add the following to the items.lua:
 ```
 
 ## 📖 Dependencies
-[sd_lib](https://github.com/Samuels-Development/sd_lib/releases)
+[SD Library](https://github.com/Samuels-Development/sd_lib/releases)
 
-Supported Frameworks: QBCore, Qbox (`qbox` at checkout), ESX
-
-Interaction Methods:
-- Target: qb-target, qtarget, ox_target
-- TextUI: qb-drawtext (qb-core function), cd_drawtextui, ox_lib textui
+By utilizing my library, this script is compatible with `QBCore`, `QBox`, and `ESX` frameworks. In terms of interaction methods, it supports `qb-target`, `qtarget`, and `ox_target`, as well as `qb-drawtext`, `cd_drawtextui`, and `ox_lib's` textUI.
