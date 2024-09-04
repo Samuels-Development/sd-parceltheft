@@ -18,7 +18,7 @@ Config.Loot = {
 }
 
 
-PoliceAlert = {
+Config.PoliceAlert = {
     Enabled = true, -- Toggle police alert on or off
     NightChance = 17, -- Chance of police alert at night
     DayChance = 35, -- Chance of police alert during the day

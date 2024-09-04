@@ -89,7 +89,7 @@ local CreateInteractionZone = function(location, k, spawnedProp, interactionName
                             if Config.PoliceAlert.NightChance >= math.random(1, 100) then
                                 policeAlert()
                             end
-                        elsE
+                        else
                             if Config.PoliceAlert.DayChance >= math.random(1, 100) then
                                 policeAlert()
                             end
