@@ -82,6 +82,20 @@ local CreateInteractionZone = function(location, k, spawnedProp, interactionName
         options = {
             {
                 action = function()
+                    local gameTime = GetClockHours()
+
+                    if Config.PoliceAlert.Enabled then
+                        if gameTime <= Config.PoliceAlert.NightEnd or gameTime >= Config.PoliceAlert.NightStart then
+                            if Config.PoliceAlert.NightChance >= math.random(1, 100) then
+                                policeAlert()
+                            end
+                        elsE
+                            if Config.PoliceAlert.DayChance >= math.random(1, 100) then
+                                policeAlert()
+                            end
+                        end
+                    end
+
                     TriggerServerEvent('sd-parceltheft:server:MarkPropTaken', k)
                     DeleteObject(spawnedProp)
                     SD.Interaction.RemoveZone(interactionName)

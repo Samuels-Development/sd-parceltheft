@@ -17,6 +17,32 @@ Config.Loot = {
     }
 }
 
+
+PoliceAlert = {
+    Enabled = true, -- Toggle police alert on or off
+    NightChance = 17, -- Chance of police alert at night
+    DayChance = 35, -- Chance of police alert during the day
+    NightStart = 22, -- Start of night time (hours)
+    NightEnd = 5 -- End of night time (hours)
+}
+
+-- Police Alert for Oilrig Heist
+policeAlert = function()
+    SD.PoliceDispatch({ -- (SD.PoliceDispatch is a sd_lib module and it automatically supports ps-dispatch, cd_dispatch, core-dispatch, linden_outlawalert, and qs-dispatch )
+        displayCode = "10-21C",                    -- Dispatch Code
+        title = 'Parcel Theft',                   -- Title is used in cd_dispatch/ps-dispatch
+        description = "Reported Parcel Theft",-- Description of the heist
+        message = "Sightings of a person stealing packages from poarches", -- Additional message or information
+        -- Blip information is used for ALL dispatches besides ps_dispatch, please reference dispatchcodename below.
+        sprite = 310,                            -- The blip sprite for oilrig or related icon
+        scale = 1.0,                             -- The size of the blip on the map
+        colour = 1,                              -- The color of the blip on the map (red, for example)
+        blipText = "Parcel Theft",               -- Text that appears on the Blip
+        -- ps-dispatch
+        dispatchcodename = "parcel_theft"        -- This is the name used by ps-dispatch users for the sv_dispatchcodes.lua or config.lua under the Config.Blips entry. (Depending on Version)
+    })
+  end -- This is the function that is called when the police are meant to be alerted. You can modify this in any way.
+
 -- Locations for each package
 Config.Locations = {
     {
