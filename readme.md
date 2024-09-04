@@ -16,6 +16,29 @@ Store: [Click Me](https://fivem.samueldev.shop)
 3. Place the `sd-parceltheft` folder into your server's `resources` directory.
 4. Add `ensure sd-parceltheft` to your `server.cfg` to ensure the resource starts with your server.
 
+## 📦 Item
+1. Add an item called 'parcel' to your inventory or framework.
+
+If you're using `qb-core`, add it in `qb-core/shared/items.lua` or to the items table in the database for ESX. 
+
+In the case of `ox_inventory`, add the following to the items.lua:
+```lua
+	["parcel"] = {
+		label = "Parcel",
+		weight = 350,
+		stack = false,
+		close = true,
+		consume = 0,
+		description = "Small package filled with something.",
+		client = {
+			image = "parcel.png",
+		},
+		server = {
+			export = 'sd-parceltheft.useParcel'
+		}
+	},
+```
+
 ## 📖 Dependencies
 [sd_lib](https://github.com/Samuels-Development/sd_lib/releases)
 
