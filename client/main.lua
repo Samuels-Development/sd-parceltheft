@@ -68,7 +68,7 @@ end)
 local CreateProp = function(location)
     local prop = location.prop or 'hei_prop_heist_box'
     SD.LoadModel(prop)
-    local spawnedProp = CreateObject(prop, location.coords.x, location.coords.y, location.coords.z, true, true, true)
+    local spawnedProp = CreateObject(prop, location.coords.x, location.coords.y, location.coords.z, false, true, true)
     PlaceObjectOnGroundProperly(spawnedProp)
     SetEntityHeading(spawnedProp, location.heading)
     FreezeEntityPosition(spawnedProp, true)
