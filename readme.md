@@ -19,8 +19,8 @@ Store: [Click Me](https://fivem.samueldev.shop) (use code `qbox` at checkout)
 ## 📦 Item
 Add an item called 'parcel' to your inventory or framework.
 
-If you're using `qb-core`, add it in `qb-core/shared/items.lua`.
-If you're using `es_extended`, add it to the items table in your database! 
+If you're using `qb-core`, add it in `qb-core/shared/items.lua`.<br>
+If you're using `es_extended`, add it to the items table in your database (or whatever it is that ESX users do lol)
 
 In the case of `ox_inventory`, add the following to the items.lua:
 ```lua
