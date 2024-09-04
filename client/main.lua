@@ -38,30 +38,35 @@ local CarryAnimation = function()
     end)
 end
 
+local HoldBox = function()
+    local player = PlayerPedId()
+    local packageAmount = SD.Inventory.HasItem('parcel')
+
+    if packageAmount and packageAmount > 0 then
+        if not holdingBox then
+            holdingBox = true
+            SD.LoadAnim('anim@heists@box_carry@')
+            TaskPlayAnim(player, 'anim@heists@box_carry@', 'idle', 6.0, -6.0, -1, 49, 0, 0, 0, 0)
+            CarryAnimation()
+            SD.LoadModel('hei_prop_heist_box')
+            Parcel = CreateObject('hei_prop_heist_box', 0, 0, 0, true, true, true)
+            AttachEntityToEntity(Parcel, player, GetPedBoneIndex(player, 0xEB95), 0.075, -0.10, 0.255, -130.0, 105.0, 0.0, true, true, false, false, 0, true)
+            DisableControls()
+        end
+    elseif holdingBox then
+        ClearPedTasks(player)
+        DeleteEntity(Parcel)
+        holdingBox = false
+    end
+end
+
 CreateThread(function()
     local player = PlayerPedId()
 
     while true do
         Wait(1250)
 
-        local packageAmount = SD.Inventory.HasItem('parcel')
-
-        if packageAmount and packageAmount > 0 then
-            if not holdingBox then
-                holdingBox = true
-                SD.LoadAnim('anim@heists@box_carry@')
-                TaskPlayAnim(player, 'anim@heists@box_carry@', 'idle', 6.0, -6.0, -1, 49, 0, 0, 0, 0)
-                CarryAnimation()
-                SD.LoadModel('hei_prop_heist_box')
-                Parcel = CreateObject('hei_prop_heist_box', 0, 0, 0, true, true, true)
-                AttachEntityToEntity(Parcel, player, GetPedBoneIndex(player, 0xEB95), 0.075, -0.10, 0.255, -130.0, 105.0, 0.0, true, true, false, false, 0, true)
-                DisableControls()
-            end
-        elseif holdingBox then
-            ClearPedTasks(player)
-            DeleteEntity(Parcel)
-            holdingBox = false
-        end
+        HoldBox()
     end
 end)
 
