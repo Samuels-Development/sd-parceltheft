@@ -74,10 +74,7 @@ RegisterNetEvent('sd-parceltheft:server:deleteParcel', function()
     if loot and #loot > 0 then
         for _, item in ipairs(loot) do
             SD.Inventory.AddItem(src, item.item, item.amount)
-            TriggerClientEvent('sd-parceltheft:client:notifyLootReceived', src, item.item, item.amount)
         end
-    else
-        TriggerClientEvent('sd-parceltheft:client:notifyNoLoot', src)
     end
 end)
 
