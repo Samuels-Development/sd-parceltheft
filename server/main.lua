@@ -2,10 +2,7 @@ local locale = SD.Locale.T
 local takenProps = {}
 
 SD.Inventory.RegisterUsableItem('parcel', function(source)
-    local src = source
-    if SD.Inventory.HasItem(src, 'parcel') > 0 then 
-        TriggerClientEvent('sd-parceltheft:client:openBox', source)
-    end
+    TriggerClientEvent('sd-parceltheft:client:openBox', source)
 end)
 
 SD.Callback.Register('sd-parceltheft:server:GetLocations', function(source)
