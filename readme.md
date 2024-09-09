@@ -3,7 +3,7 @@
 `sd-parceltheft` is a straightforward script that lets players steal parcels from houses and open them for random rewards. Parcels are synced globally, with taken parcels respawning after a set time. The script includes 23 default locations, with easy customization to add more. Props dynamically spawn and despawn based on player proximity.
 
 ## 🎥 Preview
-https://streamable.com/6bnx5d
+https://www.youtube.com/watch?v=X0siC0uXwg8
 
 ## 🔔 Contact
 Author: Samuel#0008  
