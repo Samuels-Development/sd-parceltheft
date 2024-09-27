@@ -41,6 +41,6 @@ In the case of `ox_inventory`, add the following to the items.lua:
 ```
 
 ## 📖 Dependencies
-[SD Library](https://github.com/Samuels-Development/sd_lib/releases)
+[sd_lib](https://github.com/Samuels-Development/sd_lib/releases)
 
 By utilizing my library, this script is compatible with `QBCore`, `QBox`, and `ESX` frameworks. In terms of interaction methods, it supports `qb-target`, `qtarget`, and `ox_target`, as well as `qb-drawtext`, `cd_drawtextui`, and `ox_lib's` textUI.
