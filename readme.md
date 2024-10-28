@@ -7,7 +7,7 @@ https://www.youtube.com/watch?v=X0siC0uXwg8
 
 ## 🔔 Contact
 Author: Samuel#0008  
-Discord: [Join the Discord](https://discord.gg/samueldev)<br>
+Discord: [Join the Discord](https://discord.gg/FzPehMQaBQ)<br>
 Store: [Click Me](https://fivem.samueldev.shop) (use code `qbox` at checkout)
 
 ## 💾 Installation
