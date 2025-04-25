@@ -24,13 +24,13 @@ local function TakePackage(src, propId)
     local distance      = #(playerCoords - propLocation)
 
     if takenProps[propId] then
-        print(locale('prints.package_already_taken', { src }))
+        print(locale('prints.package_already_taken', { source = src }))
         DropPlayer(src, locale('prints.package_already_taken_drop_reason'))
         return
     end
 
     if distance > allowedRange then
-        print(locale('prints.out_of_range', { src, propId }))
+        print(locale('prints.out_of_range', { source = src, location = propId }))
         DropPlayer(src, locale('prints.out_of_range_drop_reason'))
         return
     end
