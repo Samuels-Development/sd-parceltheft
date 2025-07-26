@@ -41,7 +41,7 @@ policeAlert = function()
         -- ps-dispatch
         dispatchcodename = "parcel_theft"        -- This is the name used by ps-dispatch users for the sv_dispatchcodes.lua or config.lua under the Config.Blips entry. (Depending on Version)
     })
-  end -- This is the function that is called when the police are meant to be alerted. You can modify this in any way.
+end -- This is the function that is called when the police are meant to be alerted. You can modify this in any way.
 
 -- Locations for each package
 Config.Locations = {

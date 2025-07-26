@@ -1,49 +1,53 @@
 -- server/main.lua
 local locale = SD.Locale.T
-local takenProps = {}
 
--- When player uses a “parcel” item, tell their client to open the box
+-- Initialize statebags for all package locations
+CreateThread(function()
+    for k, _ in pairs(Config.Locations) do
+        GlobalState['parcel_taken_' .. k] = false
+        GlobalState['parcel_cooldown_' .. k] = false
+    end
+end)
+
+-- When player uses a "parcel" item, tell their client to open the box
 SD.Inventory.RegisterUsableItem('parcel', function(source)
     TriggerClientEvent('sd-parceltheft:client:openBox', source)
 end)
 
--- Return every package location plus whether it’s been taken
+-- Return every package location - statebags will handle the taken state
 SD.Callback.Register('sd-parceltheft:server:GetLocations', function(source)
-    local locations = Config.Locations
-    for k, location in pairs(locations) do
-        location.taken = takenProps[k] or false
-    end
-    return locations
+    return Config.Locations
 end)
 
 -- Attempt to pick up a package
-local function TakePackage(src, propId)
+local TakePackage = function(src, propId)
     local playerCoords  = GetEntityCoords(GetPlayerPed(src))
     local propLocation  = Config.Locations[propId].coords
     local allowedRange  = 5.0
     local distance      = #(playerCoords - propLocation)
 
-    if takenProps[propId] then
+    if GlobalState['parcel_taken_' .. propId] then
         print(locale('prints.package_already_taken', { source = src }))
-        DropPlayer(src, locale('prints.package_already_taken_drop_reason'))
+        -- DropPlayer(src, locale('prints.package_already_taken_drop_reason'))
         return
     end
 
     if distance > allowedRange then
         print(locale('prints.out_of_range', { source = src, location = propId }))
-        DropPlayer(src, locale('prints.out_of_range_drop_reason'))
+        -- DropPlayer(src, locale('prints.out_of_range_drop_reason'))
         return
     end
 
-    -- give them a parcel to carry
     SD.Inventory.AddItem(src, 'parcel', 1)
 
-    takenProps[propId] = true
-    TriggerClientEvent('sd-parceltheft:client:RemoveProp', -1, propId)
+    GlobalState['parcel_taken_' .. propId] = true
+    GlobalState['parcel_cooldown_' .. propId] = true
+    
+    TriggerClientEvent('sd-parceltheft:client:RemovePropInstant', -1, propId)
 end
 
 -- Randomly select loot without mutating the master table
-local function GetRandomLoot()
+local GetRandomLoot = function()
     local selectedItems = {}
     local availableItems = {}
     for i, loot in ipairs(Config.Loot.items) do
@@ -63,7 +67,7 @@ local function GetRandomLoot()
     return selectedItems
 end
 
--- When client finishes “opening” the box, delete the parcel and give loot
+-- When client finishes "opening" the box, delete the parcel and give loot
 RegisterNetEvent('sd-parceltheft:server:deleteParcel', function()
     local src = source
     if not (SD.Inventory.HasItem(src, 'parcel') > 0) then return end
@@ -86,8 +90,10 @@ RegisterNetEvent('sd-parceltheft:server:MarkPropTaken', function(propId)
 
     CreateThread(function()
         Wait(countdownTime * 1000)
-        takenProps[propId] = nil
-        TriggerClientEvent('sd-parceltheft:client:ResetProp', -1, propId)
+        GlobalState['parcel_taken_' .. propId] = false
+        GlobalState['parcel_cooldown_' .. propId] = false
+        
+        TriggerClientEvent('sd-parceltheft:client:CooldownEnded', -1, propId)
     end)
 end)
 

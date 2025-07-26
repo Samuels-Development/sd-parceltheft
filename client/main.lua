@@ -80,10 +80,14 @@ local CreateInteractionZone = function(location, k, spawnedProp, interactionName
                 icon   = 'fas fa-box',
                 label  = locale('target.take_box'),
                 action = function()
+                    if GlobalState['parcel_taken_' .. k] then
+                        SD.ShowNotification(locale('error.package_already_taken'), 'error')
+                        return
+                    end
+
                     local gameTime = GetClockHours()
                     if Config.PoliceAlert.Enabled then
-                        if gameTime <= Config.PoliceAlert.NightEnd
-                           or gameTime >= Config.PoliceAlert.NightStart then
+                        if gameTime <= Config.PoliceAlert.NightEnd or gameTime >= Config.PoliceAlert.NightStart then
                             if Config.PoliceAlert.NightChance >= math.random(1,100) then
                                 policeAlert()
                             end
@@ -95,13 +99,46 @@ local CreateInteractionZone = function(location, k, spawnedProp, interactionName
                     end
 
                     TriggerServerEvent('sd-parceltheft:server:MarkPropTaken', k)
-                    DeleteObject(spawnedProp)
-                    SD.Interaction.RemoveZone(interactionName)
                 end
             }}
         },
         location.debug or false
     )
+end
+
+-- Remove prop and interaction zone
+local RemoveProp = function(k)
+    local interactionName = 'box_interaction_' .. k
+    
+    for i, propData in pairs(spawnedProps) do
+        if propData.id == k then
+            if DoesEntityExist(propData.prop) then
+                DeleteObject(propData.prop)
+            end
+            table.remove(spawnedProps, i)
+            break
+        end
+    end
+    
+    SD.Interaction.RemoveZone(interactionName)
+    
+    if localLocations[k] and localLocations[k].spawnedProp then
+        localLocations[k].spawnedProp = nil
+    end
+end
+
+local playerInArea = {}
+
+-- Spawn prop if conditions are met
+local SpawnPropIfAvailable = function(location, k, bypassTakenCheck)
+    if not bypassTakenCheck and GlobalState['parcel_taken_' .. k] then return end
+    if location.spawnedProp then return end
+    
+    local interactionName = 'box_interaction_' .. k
+    local spawnedProp = CreateProp(location)
+    location.spawnedProp = spawnedProp
+    table.insert(spawnedProps, { prop = spawnedProp, id = k })
+    CreateInteractionZone(location, k, spawnedProp, interactionName)
 end
 
 -- Handle enter/exit for each configured location
@@ -112,34 +149,73 @@ local HandleBoxInteraction = function(location, k)
         coords   = location.coords,
         distance = location.distance,
         onEnter  = function()
-            if localLocations[k].taken then return end
-            local spawnedProp = CreateProp(location)
-            location.spawnedProp = spawnedProp
-            table.insert(spawnedProps, { prop = spawnedProp, id = k })
-            CreateInteractionZone(location, k, spawnedProp, interactionName)
+            playerInArea[k] = true
+            SpawnPropIfAvailable(location, k)
         end,
         onExit   = function()
+            playerInArea[k] = false
             if location.spawnedProp then
                 SD.Interaction.RemoveZone(interactionName)
                 DeleteObject(location.spawnedProp)
                 location.spawnedProp = nil
+                
+                for i, propData in pairs(spawnedProps) do
+                    if propData.id == k then
+                        table.remove(spawnedProps, i)
+                        break
+                    end
+                end
             end
         end,
         debug = location.debug or false,
     })
 end
 
--- Pull the global takenProps state from the server
+-- Pull the locations from the server
 local RequestLocationsFromServer = function()
     SD.Callback('sd-parceltheft:server:GetLocations', false, function(locations)
         if not locations then return end
         for k, location in pairs(locations) do
             localLocations[k] = location
-            localLocations[k].taken = localLocations[k].taken or false
             HandleBoxInteraction(location, k)
         end
     end)
 end
+
+-- Instant prop removal event handler for immediate synchronization
+RegisterNetEvent('sd-parceltheft:client:RemovePropInstant', function(propId)
+    RemoveProp(propId)
+end)
+
+-- Statebag handlers for real-time synchronization (backup system)
+AddStateBagChangeHandler('parcel_taken_', nil, function(bagName, key, value, reserved, replicated)
+    if not replicated then return end
+    
+    local propId = tonumber(bagName:match('parcel_taken_(%d+)'))
+    if not propId then return end
+    
+    if value then
+        RemoveProp(propId)
+    end
+end)
+
+AddStateBagChangeHandler('parcel_cooldown_', nil, function(bagName, key, value, reserved, replicated)
+    if not replicated then return end
+    
+    local propId = tonumber(bagName:match('parcel_cooldown_(%d+)'))
+    if not propId then return end
+    
+    if not value and playerInArea[propId] and localLocations[propId] then
+        SpawnPropIfAvailable(localLocations[propId], propId, true)
+    end
+end)
+
+-- Direct event handler for cooldown reset
+RegisterNetEvent('sd-parceltheft:client:CooldownEnded', function(propId)
+    if playerInArea[propId] and localLocations[propId] then
+        SpawnPropIfAvailable(localLocations[propId], propId, true)
+    end
+end)
 
 -- Initial fetch on resource start
 CreateThread(function()
@@ -152,28 +228,7 @@ AddEventHandler('playerSpawned', function()
     RequestLocationsFromServer()
 end)
 
--- When anyone takes a prop, remove it locally
-RegisterNetEvent('sd-parceltheft:client:RemoveProp', function(propId)
-    for _, propData in pairs(spawnedProps) do
-        if propData.id == propId then
-            if localLocations[propId] then
-                localLocations[propId].taken = true
-            end
-            DeleteObject(propData.prop)
-            SD.Interaction.RemoveZone('box_interaction_' .. propId)
-            break
-        end
-    end
-end)
-
--- Reset a prop after the cooldown
-RegisterNetEvent('sd-parceltheft:client:ResetProp', function(propId)
-    if localLocations[propId] then
-        localLocations[propId].taken = false
-    end
-end)
-
--- Handle the “opening box” progress and notification
+-- Handle the "opening box" progress and notification
 RegisterNetEvent('sd-parceltheft:client:openBox', function()
     local ped = PlayerPedId()
     SD.StartProgress('opening_parcel', locale('progress.opening_parcel'), 2500,

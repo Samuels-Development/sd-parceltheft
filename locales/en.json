@@ -1,6 +1,7 @@
 {
   "error": {
-    "opening_canceled": "Parcel opening canceled."
+    "opening_canceled": "Parcel opening canceled.",
+    "package_already_taken": "This package has already been taken by someone else."
   },
   "success": {
     "parcel_opened": "Parcel opened successfully!"
