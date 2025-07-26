@@ -3,7 +3,7 @@ game 'gta5'
 
 name "Parcel Theft"
 author "Made with love by Samuel#0008"
-Version "1.0.4"
+Version "1.0.5"
 
 client_scripts { 'client/*.lua' }
 
