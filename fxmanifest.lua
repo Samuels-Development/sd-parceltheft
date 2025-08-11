@@ -3,7 +3,7 @@ game 'gta5'
 
 name "Parcel Theft"
 author "Made with love by Samuel#0008"
-Version "1.0.5"
+Version "1.0.6"
 
 client_scripts { 'client/*.lua' }
 
@@ -14,3 +14,4 @@ server_scripts { 'server/main.lua', }
 files { 'locales/*.json' }
 
 lua54 'yes'
+
