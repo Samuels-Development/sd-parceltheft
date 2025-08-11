@@ -3,17 +3,24 @@ Config = {}
 SD.Locale.LoadLocale('en')
 
 Config.Interaction = 'target' -- 'target' = qb-target/qtarget/ox_target or 'textui' = cd_drawtextui/qb-core/ox_lib textui
-Config.PropCooldown = 600 -- Cooldown in seconds for props to respawn after being taken
+Config.PropCooldown = 750 -- Cooldown in seconds for props to respawn after being taken
 
 -- Config.Loot defines the possible loot items, each with a weighted chance.
 -- The 'chance' value represents the relative probability of each item being selected.
 Config.Loot = {
     amount = math.random(1, 3), -- Number of different items that can be received from one package
     items = {
-        { item = 'gold_bar', minAmount = 1, maxAmount = 3, chance = 50 },
-        { item = 'diamond', minAmount = 1, maxAmount = 2, chance = 30 },
-        { item = 'rolex', minAmount = 1, maxAmount = 2, chance = 30 },
-        { item = '10kgoldchain', minAmount = 1, maxAmount = 2, chance = 30 },
+        { item = 'goldbar', minAmount = 1, maxAmount = 2, chance = 10 },
+        { item = 'lockpick', minAmount = 1, maxAmount = 2, chance = 30 },
+        { item = 'gold_watch', minAmount = 1, maxAmount = 2, chance = 30 },
+        { item = 'goldchain', minAmount = 1, maxAmount = 2, chance = 30 },
+        { item = 'thermite', minAmount = 1, maxAmount = 1, chance = 2 },
+        { item = 'gang-keychain', minAmount = 1, maxAmount = 1, chance = 5 },
+        { item = 'stolen_toaster_01', minAmount = 1, maxAmount = 1, chance = 15 },
+        { item = 'stolen_laptop_01a', minAmount = 1, maxAmount = 1, chance = 25 },
+        { item = 'stolen_mixer_01', minAmount = 1, maxAmount = 1, chance = 25 },
+        { item = 'stolen_coffemac_02', minAmount = 1, maxAmount = 1, chance = 25 },
+        { item = 'purse', minAmount = 1, maxAmount = 1, chance = 30 },
     }
 }
 
@@ -32,7 +39,7 @@ policeAlert = function()
         displayCode = "10-21C",                    -- Dispatch Code
         title = 'Parcel Theft',                   -- Title is used in cd_dispatch/ps-dispatch
         description = "Reported Parcel Theft",-- Description of the heist
-        message = "Sightings of a person stealing packages from poarches", -- Additional message or information
+        message = "Sightings of a person stealing packages from porches", -- Additional message or information
         -- Blip information is used for ALL dispatches besides ps_dispatch, please reference dispatchcodename below.
         sprite = 310,                            -- The blip sprite for oilrig or related icon
         scale = 1.0,                             -- The size of the blip on the map
@@ -43,7 +50,6 @@ policeAlert = function()
     })
 end -- This is the function that is called when the police are meant to be alerted. You can modify this in any way.
 
--- Locations for each package
 Config.Locations = {
     {
         coords = vector3(1060.63, -378.30, 67.24),
@@ -202,6 +208,189 @@ Config.Locations = {
     {
         coords = vector3(993.62, -620.83, 58.05),
         heading = -57.00,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-374.62, 6190.97, 31.73),
+        heading = 226.54,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-356.98, 6207.49, 31.84),
+        heading = 226.31,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-347.54, 6225.34, 31.88),
+        heading = 226.98,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-379.95, 6252.66, 31.85),
+        heading = 317.37,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-360.19, 6260.57, 31.90),
+        heading = 136.28,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-449.92, 6261.68, 30.04),
+        heading = 67.62,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-442.47, 6197.88, 29.55),
+        heading = 94.57,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-302.12, 6326.95, 32.89),
+        heading = 42.01,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-227.23, 6377.42, 31.76),
+        heading = 47.65,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-105.58, 6528.65, 30.17),
+        heading = 305.62,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-8.41, 6653.31, 31.11),
+        heading = 291.92,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(35.45, 6663.22, 32.19),
+        heading = 166.79,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-272.57, 6401.05, 31.50),
+        heading = 210.52,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(-213.60, 6396.30, 33.09),
+        heading = 40.42,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    -- Sandy Shores
+    {
+        coords = vector3(1371.92, 3647.19, 34.34),
+        heading = 15.12,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1392.07, 3659.32, 34.29),
+        heading = 16.49,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1631.71, 3720.50, 34.39),
+        heading = 127.86,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1735.13, 3809.95, 34.84),
+        heading = 33.46,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1925.16, 3824.65, 32.44),
+        heading = 31.29,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1898.85, 3781.72, 32.88),
+        heading = 298.80,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1824.66, 3743.32, 34.72),
+        heading = 16.94,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1797.48, 3721.86, 34.64),
+        heading = 306.19,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1639.21, 3731.31, 35.07),
+        heading = 325.65,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1437.14, 3605.43, 35.07),
+        heading = 207.48,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1437.14, 3639.62, 36.17),
+        heading = 7.91,
+        distance = 25.0,
+        prop = 'hei_prop_heist_box',
+        debug = false
+    },
+    {
+        coords = vector3(1382.57, 3605.43, 35.07),
+        heading = 207.48,
         distance = 25.0,
         prop = 'hei_prop_heist_box',
         debug = false

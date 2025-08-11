@@ -3,6 +3,8 @@ local locale = SD.Locale.T
 local holdingBox     = false
 local spawnedProps   = {}
 local localLocations = {}
+local activeTargets  = {}
+local playerInArea = {}
 
 -- Disable sprint/shoot/etc while carrying
 local DisableControls = function()
@@ -58,6 +60,82 @@ CreateThread(function()
     end
 end)
 
+-- Remove prop and interaction zone
+local RemoveProp = function(k)
+    local interactionName = 'box_interaction_' .. k
+    
+    if activeTargets[interactionName] then
+        if DoesEntityExist(activeTargets[interactionName]) then
+            exports.ox_target:removeLocalEntity(activeTargets[interactionName])
+        end
+        activeTargets[interactionName] = nil
+    end
+    
+    for i = #spawnedProps, 1, -1 do
+        local propData = spawnedProps[i]
+        if propData.id == k then
+            if DoesEntityExist(propData.prop) then
+                DeleteObject(propData.prop)
+            end
+            table.remove(spawnedProps, i)
+        end
+    end
+    
+    -- Clear location reference
+    if localLocations[k] then
+        localLocations[k].spawnedProp = nil
+    end
+end
+
+-- Monitoring thread to check for props that shouldn't exist
+CreateThread(function()
+    while true do
+        Wait(5000)
+        
+        for i = #spawnedProps, 1, -1 do
+            local propData = spawnedProps[i]
+            local propId = propData.id
+            
+            if not DoesEntityExist(propData.prop) then
+                table.remove(spawnedProps, i)
+                local interactionName = 'box_interaction_' .. propId
+                if activeTargets[interactionName] then
+                    activeTargets[interactionName] = nil
+                end
+                if localLocations[propId] then
+                    localLocations[propId].spawnedProp = nil
+                end
+            else
+                local shouldRemove = false
+                
+                if GlobalState['parcel_taken_' .. propId] then
+                    shouldRemove = true
+                end
+                
+                if GlobalState['parcel_cooldown_' .. propId] then
+                    shouldRemove = true
+                end
+                
+                if not playerInArea[propId] then
+                    shouldRemove = true
+                end
+                
+                if shouldRemove then
+                    print('[Parcel Monitor] Removing invalid prop at location ' .. propId)
+                    RemoveProp(propId)
+                end
+            end
+        end
+        
+        for interactionName, entity in pairs(activeTargets) do
+            if not DoesEntityExist(entity) then
+                print('[Parcel Monitor] Cleaning up orphaned target: ' .. interactionName)
+                activeTargets[interactionName] = nil
+            end
+        end
+    end
+end)
+
 -- Utility to spawn the box prop
 local CreateProp = function(location)
     local prop = location.prop or 'hei_prop_heist_box'
@@ -69,17 +147,31 @@ local CreateProp = function(location)
     return spawnedProp
 end
 
--- Set up the target zone on the spawned prop
+-- Set up the target zone on the spawned prop using ox_target
 local CreateInteractionZone = function(location, k, spawnedProp, interactionName)
-    SD.Interaction.AddBoxZone(interactionName, interactionName,
-        vector3(location.coords.x, location.coords.y, location.coords.z - 1),
-        1.0, 1.0, {
-            heading  = location.heading,
-            distance = 2.0,
-            options  = {{
-                icon   = 'fas fa-box',
-                label  = locale('target.take_box'),
-                action = function()
+    if activeTargets[interactionName] then
+        return
+    end
+    
+    if not DoesEntityExist(spawnedProp) then
+        print('[Parcel Target] Cannot create target - prop does not exist for location ' .. k)
+        return
+    end
+    
+    CreateThread(function()
+        Wait(100)
+        
+        if not DoesEntityExist(spawnedProp) then
+            print('[Parcel Target] Prop disappeared before target creation for location ' .. k)
+            return
+        end
+        
+        exports.ox_target:addLocalEntity(spawnedProp, {
+            {
+                icon = 'fas fa-box',
+                label = locale('target.take_box'),
+                distance = 2.0,
+                onSelect = function()
                     if GlobalState['parcel_taken_' .. k] then
                         SD.ShowNotification(locale('error.package_already_taken'), 'error')
                         return
@@ -100,51 +192,48 @@ local CreateInteractionZone = function(location, k, spawnedProp, interactionName
 
                     TriggerServerEvent('sd-parceltheft:server:MarkPropTaken', k)
                 end
-            }}
-        },
-        location.debug or false
-    )
+            }
+        })
+        
+        activeTargets[interactionName] = spawnedProp
+        print('[Parcel Target] Successfully created target for location ' .. k)
+    end)
 end
-
--- Remove prop and interaction zone
-local RemoveProp = function(k)
-    local interactionName = 'box_interaction_' .. k
-    
-    for i, propData in pairs(spawnedProps) do
-        if propData.id == k then
-            if DoesEntityExist(propData.prop) then
-                DeleteObject(propData.prop)
-            end
-            table.remove(spawnedProps, i)
-            break
-        end
-    end
-    
-    SD.Interaction.RemoveZone(interactionName)
-    
-    if localLocations[k] and localLocations[k].spawnedProp then
-        localLocations[k].spawnedProp = nil
-    end
-end
-
-local playerInArea = {}
 
 -- Spawn prop if conditions are met
 local SpawnPropIfAvailable = function(location, k, bypassTakenCheck)
-    if not bypassTakenCheck and GlobalState['parcel_taken_' .. k] then return end
-    if location.spawnedProp then return end
+    if not bypassTakenCheck and GlobalState['parcel_taken_' .. k] then 
+        print('[Parcel Spawn] Skipping spawn for location ' .. k .. ' - already taken')
+        return 
+    end
+    
+    if location.spawnedProp and DoesEntityExist(location.spawnedProp) then 
+        print('[Parcel Spawn] Skipping spawn for location ' .. k .. ' - prop already exists')
+        return 
+    end
+    
+    -- Clean up any stale references
+    if location.spawnedProp and not DoesEntityExist(location.spawnedProp) then
+        location.spawnedProp = nil
+    end
     
     local interactionName = 'box_interaction_' .. k
     local spawnedProp = CreateProp(location)
+    
+    if not DoesEntityExist(spawnedProp) then
+        print('[Parcel Spawn] Failed to create prop for location ' .. k)
+        return
+    end
+    
     location.spawnedProp = spawnedProp
     table.insert(spawnedProps, { prop = spawnedProp, id = k })
     CreateInteractionZone(location, k, spawnedProp, interactionName)
+    
+    print('[Parcel Spawn] Successfully spawned prop for location ' .. k)
 end
 
 -- Handle enter/exit for each configured location
 local HandleBoxInteraction = function(location, k)
-    local interactionName = 'box_interaction_' .. k
-
     SD.Points.New({
         coords   = location.coords,
         distance = location.distance,
@@ -155,16 +244,7 @@ local HandleBoxInteraction = function(location, k)
         onExit   = function()
             playerInArea[k] = false
             if location.spawnedProp then
-                SD.Interaction.RemoveZone(interactionName)
-                DeleteObject(location.spawnedProp)
-                location.spawnedProp = nil
-                
-                for i, propData in pairs(spawnedProps) do
-                    if propData.id == k then
-                        table.remove(spawnedProps, i)
-                        break
-                    end
-                end
+                RemoveProp(k)
             end
         end,
         debug = location.debug or false,
@@ -247,13 +327,21 @@ end)
 -- Clean up on resource stop
 AddEventHandler('onResourceStop', function(resourceName)
     if GetCurrentResourceName() ~= resourceName then return end
-    SD.Interaction.RemoveAllZones()
+    
+    for interactionName, entity in pairs(activeTargets) do
+        if DoesEntityExist(entity) then
+            exports.ox_target:removeLocalEntity(entity)
+        end
+    end
+    activeTargets = {}
+    
     for _, propData in pairs(spawnedProps) do
         if DoesEntityExist(propData.prop) then
             DeleteObject(propData.prop)
         end
     end
+    spawnedProps = {}
+    
     ClearPedTasks(PlayerPedId())
     if Parcel then DeleteEntity(Parcel) end
-    spawnedProps = {}
 end)
